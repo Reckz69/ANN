@@ -1,0 +1,95 @@
+import numpy as np
+
+np.set_printoptions(suppress=False)
+
+class NeuralNetwork:
+
+    def __init__(self, input_size, hidden_size, output_size):
+
+        self.W1 = np.random.randn(input_size, hidden_size)
+
+        self.b1 = np.zeros((1, hidden_size))
+
+        self.W2 = np.random.randn(hidden_size, output_size)
+
+        self.b2 = np.zeros((1, output_size))
+
+    def sigmoid(self, x):
+
+        return 1 / (1 + np.exp(-x))
+
+    def sigmoid_derivative(self, x):
+
+        return x * (1 - x)
+
+    def forward_propagation(self, X):
+
+        self.z1 = np.dot(X, self.W1) + self.b1
+
+        self.a1 = self.sigmoid(self.z1)
+
+        self.z2 = np.dot(self.a1, self.W2) + self.b2
+
+        self.y_hat = self.sigmoid(self.z2)
+
+        return self.y_hat
+
+    def backward_propagation(self, X, y, y_hat, lr):
+
+        error = y - y_hat
+
+        delta2 = error * self.sigmoid_derivative(y_hat)
+
+        a1_error = delta2.dot(self.W2.T)
+
+        delta1 = a1_error * self.sigmoid_derivative(self.a1)
+
+        self.W2 += self.a1.T.dot(delta2) * lr
+
+        self.b2 += np.sum(delta2, axis=0, keepdims=True) * lr
+
+        self.W1 += X.T.dot(delta1) * lr
+
+        self.b1 += np.sum(delta1, axis=0, keepdims=True) * lr
+
+    def train(self, X, y, epochs, lr):
+
+        for i in range(epochs):
+
+            y_hat = self.forward_propagation(X)
+
+            self.backward_propagation(X, y, y_hat, lr)
+
+    def predict(self, X):
+
+        return self.forward_propagation(X)
+
+
+# Input dataset
+X = np.array([
+    [0, 0],
+    [0, 1],
+    [1, 0],
+    [1, 1]
+])
+
+# Output dataset
+y = np.array([
+    [0],
+    [1],
+    [1],
+    [0]
+])
+
+# Create neural network
+nn = NeuralNetwork(2, 4, 1)
+
+# Train network
+nn.train(X, y, epochs=10000, lr=0.1)
+
+# Predictions
+predictions = nn.predict(X)
+
+print("Output:\n")
+
+print(predictions)
