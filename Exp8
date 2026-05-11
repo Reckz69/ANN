@@ -1,0 +1,47 @@
+import numpy as np
+
+# Initialize parameters
+num_features = 4
+num_clusters = 2
+vigilance = 0.6   # Similarity threshold
+
+# Training data (binary patterns)
+data = np.array([
+    [1, 1, 0, 0],
+    [1, 0, 0, 0],
+    [0, 0, 1, 1],
+    [0, 0, 1, 0]
+])
+
+# Initialize weights with all ones
+weights = np.ones((num_clusters, num_features))
+
+print("Initial Weights:")
+print(weights)
+
+# ART1 Training
+for sample in data:
+
+    print("\nInput:", sample)
+
+    for j in range(num_clusters):
+
+        # Compute match value
+        match = np.sum(np.minimum(sample, weights[j])) / np.sum(sample)
+
+        print(f"Cluster {j} match: {match:.2f}")
+
+        # Check vigilance criterion
+        if match >= vigilance:
+
+            print(f"Assigned to Cluster {j}")
+
+            # Update weights
+            # Keep only common features
+            weights[j] = np.minimum(weights[j], sample)
+
+            break
+
+# Final cluster weights
+print("\nFinal Weights:")
+print(weights)
