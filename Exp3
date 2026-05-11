@@ -66,3 +66,5 @@ for i in range(test_X.shape[0]):
     y = perceptron.predict(x)
 
     print(f'{x} is {"even" if y == 0 else "odd"}')
+#end
+
