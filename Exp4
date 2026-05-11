@@ -1,0 +1,74 @@
+!mamba install scikit-learn
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.datasets import load_iris
+
+# Load dataset
+iris = load_iris()
+
+# Take only 2 features for 2D graph
+# Feature 0 -> Sepal Length
+# Feature 2 -> Petal Length
+X = iris.data[:, [0, 2]]
+
+y = iris.target
+
+# Convert to binary classification
+# 0 -> Setosa
+# 1 -> Others
+y = np.where(y == 0, 0, 1)
+
+# Initialize weights and bias
+w = np.zeros(2)
+b = 0
+
+# Training settings
+lr = 0.1
+epochs = 30
+
+# Perceptron prediction function
+def predict(x):
+    return np.where(np.dot(x, w) + b >= 0, 1, 0)
+
+# Training loop
+for _ in range(epochs):
+
+    for i in range(len(X)):
+
+        y_pred = predict(X[i])
+
+        error = y[i] - y_pred
+
+        # Update weights
+        w[:] = w + lr * error * X[i]
+
+        # Update bias
+        b = b + lr * error
+
+# Create grid for decision region
+x_min, x_max = X[:, 0].min() - 0.5, X[:, 0].max() + 0.5
+y_min, y_max = X[:, 1].min() - 0.5, X[:, 1].max() + 0.5
+
+xx, yy = np.meshgrid(
+    np.arange(x_min, x_max, 0.05),
+    np.arange(y_min, y_max, 0.05)
+)
+
+# Predict every point in grid
+Z = predict(np.c_[xx.ravel(), yy.ravel()])
+
+# Convert back to grid shape
+Z = Z.reshape(xx.shape)
+
+# Plot decision region
+plt.contourf(xx, yy, Z, alpha=0.4)
+
+# Plot actual data points
+plt.scatter(X[:, 0], X[:, 1], c=y)
+
+plt.xlabel("Sepal Length")
+plt.ylabel("Petal Length")
+
+plt.title("Perceptron Decision Regions")
+
+plt.show()
